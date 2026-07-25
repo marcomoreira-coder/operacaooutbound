@@ -1,0 +1,1238 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Grupo Escalar — Operação Outbound por Setor</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+:root {
+  --bg: #0E1417;
+  --surface: #161D20;
+  --surface2: #1F2A2E;
+  --border: rgba(255,255,255,0.07);
+  --border2: rgba(255,255,255,0.14);
+  --text: #EEF2F1;
+  --text-muted: #93A2A2;
+  --text-dim: #4E5A5A;
+  --brand: #00B8AD;
+  --brand-light: #3DD9CC;
+  --brand-dim: rgba(0,184,173,0.12);
+  --blue: #378ADD;
+  --blue-light: #85B7EB;
+  --blue-dim: rgba(55,138,221,0.12);
+  --teal: #1D9E75;
+  --teal-light: #5DCAA5;
+  --teal-dim: rgba(29,158,117,0.12);
+  --amber: #EF9F27;
+  --amber-dim: rgba(239,159,39,0.12);
+  --purple: #7F77DD;
+  --purple-dim: rgba(127,119,221,0.12);
+  --coral: #D85A30;
+  --font-display: 'Poppins', sans-serif;
+  --font-body: 'Poppins', sans-serif;
+  --font-mono: 'DM Mono', monospace;
+  --r: 10px;
+  --r-lg: 16px;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
+.container { max-width: 1100px; margin: 0 auto; padding: 0 32px; }
+header {
+  border-bottom: 0.5px solid var(--border);
+  padding: 22px 0;
+  position: sticky;
+  top: 0;
+  background: rgba(14,20,23,0.92);
+  backdrop-filter: blur(12px);
+  z-index: 100;
+}
+.header-inner { display: flex; align-items: center; justify-content: space-between; }
+.brand { display: flex; align-items: center; gap: 14px; }
+.brand img.logo { height: 30px; width: auto; display: block; }
+.header-badge {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--brand-light);
+  background: var(--brand-dim);
+  border: 0.5px solid rgba(0,184,173,0.25);
+  padding: 5px 12px;
+  border-radius: 20px;
+  letter-spacing: 0.03em;
+  white-space: nowrap;
+}
+.tabs-wrap {
+  border-bottom: 0.5px solid var(--border);
+  margin-top: 0;
+  background: var(--bg);
+  position: sticky;
+  top: 79px;
+  z-index: 99;
+}
+.tabs {
+  display: flex;
+  gap: 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.tabs::-webkit-scrollbar { display: none; }
+.tab {
+  padding: 16px 22px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-muted);
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s;
+  font-family: var(--font-body);
+  letter-spacing: 0.01em;
+}
+.tab:hover { color: var(--text); }
+.tab.active { color: var(--text); border-bottom-color: var(--brand); }
+.page { display: none; padding: 48px 0 80px; }
+.page.active { display: block; }
+.hero { margin-bottom: 56px; }
+.hero-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--brand-light);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.hero-eyebrow::before { content: ''; width: 24px; height: 1px; background: var(--brand); }
+.hero-kicker {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  margin-bottom: 8px;
+}
+.hero h2 {
+  font-family: var(--font-display);
+  font-size: clamp(28px, 4vw, 40px);
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1.15;
+  margin-bottom: 16px;
+}
+.hero p { font-size: 16px; color: var(--text-muted); max-width: 580px; line-height: 1.7; }
+.slbl {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  margin-bottom: 16px;
+  margin-top: 48px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.slbl::after { content: ''; flex: 1; height: 0.5px; background: var(--border); }
+.slbl-first { margin-top: 0; }
+.grid-4 { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 12px; }
+.mc {
+  background: var(--surface);
+  border: 0.5px solid var(--border);
+  border-radius: var(--r);
+  padding: 20px 22px;
+  transition: border-color 0.2s;
+}
+.mc:hover { border-color: var(--border2); }
+.mc .lbl { font-size: 11px; color: var(--text-muted); margin-bottom: 10px; letter-spacing: 0.02em; }
+.mc .val {
+  font-family: var(--font-display);
+  font-size: 34px;
+  font-weight: 600;
+  color: var(--text);
+  line-height: 1;
+}
+.mc .sub { font-size: 11px; color: var(--text-dim); margin-top: 8px; }
+.mc .sub.g { color: var(--brand-light); }
+.mc .sub.b { color: var(--brand-light); }
+.mc-accent { border-color: rgba(0,184,173,0.28); background: linear-gradient(135deg, var(--surface) 0%, rgba(0,184,173,0.07) 100%); }
+hr { border: none; border-top: 0.5px solid var(--border); margin: 40px 0; }
+.funnel-row { display: flex; align-items: center; gap: 14px; margin-bottom: 10px; }
+.fl { font-size: 13px; color: var(--text-muted); width: 240px; flex-shrink: 0; }
+.fw { flex: 1; background: var(--surface2); border-radius: 5px; height: 30px; overflow: hidden; border: 0.5px solid var(--border); }
+.fb {
+  height: 100%;
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  padding: 0 12px;
+  font-size: 11px;
+  font-family: var(--font-mono);
+  color: #fff;
+  font-weight: 500;
+  transition: width 0.8s cubic-bezier(.23,1,.32,1);
+}
+.chart-box { position: relative; width: 100%; }
+.leg { display: flex; flex-wrap: wrap; gap: 14px; margin-bottom: 12px; font-size: 11px; color: var(--text-muted); font-family: var(--font-mono); }
+.leg span { display: flex; align-items: center; gap: 6px; }
+.ldot { width: 10px; height: 10px; border-radius: 2px; flex-shrink: 0; }
+
+/* CHART CONTROLS */
+.chart-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+.seg-toggle {
+  display: inline-flex;
+  background: var(--surface);
+  border: 0.5px solid var(--border);
+  border-radius: 8px;
+  padding: 3px;
+  gap: 2px;
+}
+.seg-btn {
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-muted);
+  background: transparent;
+  border: none;
+  border-radius: 6px;
+  padding: 7px 14px;
+  cursor: pointer;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+.seg-btn:hover { color: var(--text); }
+.seg-btn.active { background: var(--brand); color: #07100F; font-weight: 600; }
+.period-select {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--text);
+  background: var(--surface);
+  border: 0.5px solid var(--border);
+  border-radius: 8px;
+  padding: 8px 12px;
+  cursor: pointer;
+  outline: none;
+}
+.period-select:hover { border-color: var(--border2); }
+@media (max-width: 800px) {
+  .grid-4 { grid-template-columns: repeat(2, minmax(0,1fr)); }
+  .container { padding: 0 18px; }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="container">
+    <div class="header-inner">
+      <div class="brand">
+        <img class="logo" alt="Grupo Escalar" src="data:image/png;base64,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">
+      </div>
+    </div>
+  </div>
+</header>
+
+<div class="tabs-wrap">
+  <div class="container">
+    <div class="tabs">
+      <button class="tab active" onclick="sw('tec',this)">Tecnologia</button>
+      <button class="tab" onclick="sw('log',this)">Logística</button>
+      <button class="tab" onclick="sw('edu',this)">Educação Executiva</button>
+      <button class="tab" onclick="sw('agro',this)">Agronegócio</button>
+      <button class="tab" onclick="sw('tur',this)">Turismo Corporativo</button>
+      <button class="tab" onclick="sw('hig',this)">Higienização & Facilities</button>
+      <button class="tab" onclick="sw('cons',this)">Consultoria Industrial</button>
+      <button class="tab" onclick="sw('ene',this)">Energia</button>
+    </div>
+  </div>
+</div>
+
+
+<div id="page-tec" class="page">
+  <div class="container">
+
+    <div class="hero" style="margin-bottom:40px">
+      <div class="hero-kicker">Operação outbound · construção de canal</div>
+      <div class="hero-eyebrow">Setor · Tecnologia</div>
+      <h2 style="font-size:clamp(26px,4vw,36px)">Evolução da prospecção em <span style="color:var(--brand-light)">Tecnologia</span></h2>
+      <p>Esforço de cold call e reuniões geradas nesse segmento, mês a mês, ao longo de 43 meses de operação (jan/23 – jul/26).</p>
+    </div>
+
+    <p class="slbl slbl-first">Esforço total no setor</p>
+    <div class="grid-4">
+      <div class="mc mc-accent">
+        <div class="lbl">Esforço total</div>
+        <div class="val">67.055</div>
+        <div class="sub b">atividades · jan/23 – jul/26</div>
+      </div>
+      <div class="mc">
+        <div class="lbl">Conexões totais</div>
+        <div class="val">22.535</div>
+        <div class="sub">taxa de conexão 33,6%</div>
+      </div>
+      <div class="mc">
+        <div class="lbl">Conectado TD</div>
+        <div class="val">4.578</div>
+        <div class="sub">20,3% dos conectados</div>
+      </div>
+      <div class="mc">
+        <div class="lbl">Meses de operação</div>
+        <div class="val">43</div>
+        <div class="sub">dados consolidados no período</div>
+      </div>
+    </div>
+    <div class="grid-4" style="margin-top:12px">
+      <div class="mc">
+        <div class="lbl">Reuniões agendadas</div>
+        <div class="val">875</div>
+        <div class="sub">geradas pela prospecção ativa</div>
+      </div>
+      <div class="mc">
+        <div class="lbl">Reuniões realizadas</div>
+        <div class="val">564</div>
+        <div class="sub g">taxa de realização 64,5%</div>
+      </div>
+      <div class="mc">
+        <div class="lbl">Mês de maior esforço</div>
+        <div class="val" style="font-size:22px">mar/26</div>
+        <div class="sub">3.051 atividades</div>
+      </div>
+      <div class="mc">
+        <div class="lbl">Mês de mais reuniões</div>
+        <div class="val" style="font-size:22px">out/25</div>
+        <div class="sub g">32 realizadas</div>
+      </div>
+    </div>
+
+    <p class="slbl">Evolução mensal</p>
+    <div class="chart-controls" data-slug="tec">
+      <div class="seg-toggle">
+        <button class="seg-btn active" data-metric="combined">Esforço x Reuniões</button>
+        <button class="seg-btn" data-metric="esforco">Esforço</button>
+        <button class="seg-btn" data-metric="realizados">Reuniões realizadas</button>
+      </div>
+      <select class="period-select">
+            <option value="all">Todo o período</option>
+            <option value="6">Últimos 6 meses</option>
+            <option value="12">Últimos 12 meses</option>
+            <option value="24">Últimos 24 meses</option>
+      </select>
+    </div>
+    <div class="leg" id="leg-tec">
+      <span><span class="ldot" style="background:#00B8AD"></span>Esforço (atividades)</span>
+    </div>
+    <div class="chart-box" style="height:260px">
+      <canvas id="c-tec" role="img" aria-label="Evolução mensal em Tecnologia">Volume mensal no setor Tecnologia.</canvas>
+    </div>
+
+    <hr>
+
+    <p class="slbl">Funil de conversão — Tecnologia</p>
+    <div style="margin-top:8px">
+      <div class="funnel-row">
+        <div class="fl">Esforço (atividades)</div>
+        <div class="fw"><div class="fb" style="width:100.00%;background:#185FA5">100.0% · 67.055</div></div>
+      </div>
+      <div class="funnel-row">
+        <div class="fl">Conexões totais</div>
+        <div class="fw"><div class="fb" style="width:33.61%;background:#1A538F">33.6% · 22.535</div></div>
+      </div>
+      <div class="funnel-row">
+        <div class="fl">Conectado TD</div>
+        <div class="fw"><div class="fb" style="width:6.83%;background:#1D6FA8">6.8% · 4.578</div></div>
+      </div>
+      <div class="funnel-row">
+        <div class="fl">Reuniões agendadas</div>
+        <div class="fw"><div class="fb" style="width:2.00%;background:#1D9E75">1.3% · 875</div></div>
+      </div>
+      <div class="funnel-row">
+        <div class="fl">Reuniões realizadas</div>
+        <div class="fw"><div class="fb" style="width:2.00%;background:#0F6E56">0.8% · 564</div></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div id="page-log" class="page">
+  <div class="container">
+
+    <div class="hero" style="margin-bottom:40px">
+      <div class="hero-kicker">Operação outbound · construção de canal</div>
+      <div class="hero-eyebrow">Setor · Logística</div>
+      <h2 style="font-size:clamp(26px,4vw,36px)">Evolução da prospecção em <span style="color:var(--brand-light)">Logística</span></h2>
+      <p>Esforço de cold call e reuniões geradas nesse segmento, mês a mês, ao longo de 12 meses de operação (ago/25 – jul/26).</p>
+    </div>
+
+    <p class="slbl slbl-first">Esforço total no setor</p>
+    <div class="grid-4">
+      <div class="mc mc-accent">
+        <div class="lbl">Esforço total</div>
+        <div class="val">8.941</div>
+        <div class="sub b">atividades · ago/25 – jul/26</div>
+      </div>
+      <div class="mc">
+        <div class="lbl">Conexões totais</div>
+        <div class="val">2.435</div>
+        <div class="sub">taxa de conexão 27,2%</div>
+      </div>
+      <div class="mc">
+        <div class="lbl">Conectado TD</div>
+        <div class="val">624</div>
+        <div class="sub">25,6% dos conectados</div>
+      </div>
+      <div class="mc">
+        <div class="lbl">Meses de operação</div>
+        <div class="val">12</div>
+        <div class="sub">dados consolidados no período</div>
+      </div>
+    </div>
+    <div class="grid-4" style="margin-top:12px">
+      <div class="mc">
+        <div class="lbl">Reuniões agendadas</div>
+        <div class="val">184</div>
+        <div class="sub">geradas pela prospecção ativa</div>
+      </div>
+      <div class="mc">
+        <div class="lbl">Reuniões realizadas</div>
+        <div class="val">145</div>
+        <div class="sub g">taxa de realização 78,8%</div>
+      </div>
+      <div class="mc">
+        <div class="lbl">Mês de maior esforço</div>
+        <div class="val" style="font-size:22px">jun/26</div>
+        <div class="sub">1.308 atividades</div>
+      </div>
+      <div class="mc">
+        <div class="lbl">Mês de mais reuniões</div>
+        <div class="val" style="font-size:22px">abr/26</div>
+        <div class="sub g">24 realizadas</div>
+      </div>
+    </div>
+
+    <p class="slbl">Evolução mensal</p>
+    <div class="chart-controls" data-slug="log">
+      <div class="seg-toggle">
+        <button class="seg-btn active" data-metric="combined">Esforço x Reuniões</button>
+        <button class="seg-btn" data-metric="esforco">Esforço</button>
+        <button class="seg-btn" data-metric="realizados">Reuniões realizadas</button>
+      </div>
+      <select class="period-select">
+            <option value="all">Todo o período</option>
+            <option value="6">Últimos 6 meses</option>
+      </select>
+    </div>
+    <div class="leg" id="leg-log">
+      <span><span class="ldot" style="background:#378ADD"></span>Esforço (atividades)</span>
+    </div>
+    <div class="chart-box" style="height:260px">
+      <canvas id="c-log" role="img" aria-label="Evolução mensal em Logística">Volume mensal no setor Logística.</canvas>
+    </div>
+
+    <hr>
+
+    <p class="slbl">Funil de conversão — Logística</p>
+    <div style="margin-top:8px">
+      <div class="funnel-row">
+        <div class="fl">Esforço (atividades)</div>
+        <div class="fw"><div class="fb" style="width:100.00%;background:#185FA5">100.0% · 8.941</div></div>
+      </div>
+      <div class="funnel-row">
+        <div class="fl">Conexões totais</div>
+        <div class="fw"><div class="fb" style="width:27.23%;background:#1A538F">27.2% · 2.435</div></div>
+      </div>
+      <div class="funnel-row">
+        <div class="fl">Conectado TD</div>
+        <div class="fw"><div class="fb" style="width:6.98%;background:#1D6FA8">7.0% · 624</div></div>
+      </div>
+      <div class="funnel-row">
+        <div class="fl">Reuniões agendadas</div>
+        <div class="fw"><div class="fb" style="width:2.06%;background:#1D9E75">2.1% · 184</div></div>
+      </div>
+      <div class="funnel-row">
+        <div class="fl">Reuniões realizadas</div>
+        <div class="fw"><div class="fb" style="width:2.00%;background:#0F6E56">1.6% · 145</div></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div id="page-edu" class="page">
+  <div class="container">
+
+    <div class="hero" style="margin-bottom:40px">
+      <div class="hero-kicker">Operação outbound · construção de canal</div>
+      <div class="hero-eyebrow">Setor · Educação Executiva</div>
+      <h2 style="font-size:clamp(26px,4vw,36px)">Evolução da prospecção em <span style="color:var(--brand-light)">Educação Executiva</span></h2>
+      <p>Esforço de cold call e reuniões geradas nesse segmento, mês a mês, ao longo de 22 meses de operação (out/24 – jul/26).</p>
+    </div>
+
+    <p class="slbl slbl-first">Esforço total no setor</p>
+    <div class="grid-4">
+      <div class="mc mc-accent">
+        <div class="lbl">Esforço total</div>
+        <div class="val">8.900</div>
+        <div class="sub b">atividades · out/24 – jul/26</div>
+      </div>
+      <div class="mc">
+        <div class="lbl">Conexões totais</div>
+        <div class="val">2.990</div>
+        <div class="sub">taxa de conexão 33,6%</div>
+      </div>
+      <div class="mc">
+        <div class="lbl">Conectado TD</div>
+        <div class="val">616</div>
+        <div class="sub">20,6% dos conectados</div>
+      </div>
+      <div class="mc">
+        <div class="lbl">Meses de operação</div>
+        <div class="val">22</div>
+        <div class="sub">dados consolidados no período</div>
+      </div>
+    </div>
+    <div class="grid-4" style="margin-top:12px">
+      <div class="mc">
+        <div class="lbl">Reuniões agendadas</div>
+        <div class="val">100</div>
+        <div class="sub">geradas pela prospecção ativa</div>
+      </div>
+      <div class="mc">
+        <div class="lbl">Reuniões realizadas</div>
+        <div class="val">65</div>
+        <div class="sub g">taxa de realização 65,0%</div>
+      </div>
+      <div class="mc">
+        <div class="lbl">Mês de maior esforço</div>
+        <div class="val" style="font-size:22px">out/24</div>
+        <div class="sub">793 atividades</div>
+      </div>
+      <div class="mc">
+        <div class="lbl">Mês de mais reuniões</div>
+        <div class="val" style="font-size:22px">mai/25</div>
+        <div class="sub g">5 realizadas</div>
+      </div>
+    </div>
+
+    <p class="slbl">Evolução mensal</p>
+    <div class="chart-controls" data-slug="edu">
+      <div class="seg-toggle">
+        <button class="seg-btn active" data-metric="combined">Esforço x Reuniões</button>
+        <button class="seg-btn" data-metric="esforco">Esforço</button>
+        <button class="seg-btn" data-metric="realizados">Reuniões realizadas</button>
+      </div>
+      <select class="period-select">
+            <option value="all">Todo o período</option>
+            <option value="6">Últimos 6 meses</option>
+            <option value="12">Últimos 12 meses</option>
+      </select>
+    </div>
+    <div class="leg" id="leg-edu">
+      <span><span class="ldot" style="background:#EF9F27"></span>Esforço (atividades)</span>
+    </div>
+    <div class="chart-box" style="height:260px">
+      <canvas id="c-edu" role="img" aria-label="Evolução mensal em Educação Executiva">Volume mensal no setor Educação Executiva.</canvas>
+    </div>
+
+    <hr>
+
+    <p class="slbl">Funil de conversão — Educação Executiva</p>
+    <div style="margin-top:8px">
+      <div class="funnel-row">
+        <div class="fl">Esforço (atividades)</div>
+        <div class="fw"><div class="fb" style="width:100.00%;background:#185FA5">100.0% · 8.900</div></div>
+      </div>
+      <div class="funnel-row">
+        <div class="fl">Conexões totais</div>
+        <div class="fw"><div class="fb" style="width:33.60%;background:#1A538F">33.6% · 2.990</div></div>
+      </div>
+      <div class="funnel-row">
+        <div class="fl">Conectado TD</div>
+        <div class="fw"><div class="fb" style="width:6.92%;background:#1D6FA8">6.9% · 616</div></div>
+      </div>
+      <div class="funnel-row">
+        <div class="fl">Reuniões agendadas</div>
+        <div class="fw"><div class="fb" style="width:2.00%;background:#1D9E75">1.1% · 100</div></div>
+      </div>
+      <div class="funnel-row">
+        <div class="fl">Reuniões realizadas</div>
+        <div class="fw"><div class="fb" style="width:2.00%;background:#0F6E56">0.7% · 65</div></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div id="page-agro" class="page">
+  <div class="container">
+
+    <div class="hero" style="margin-bottom:40px">
+      <div class="hero-kicker">Operação outbound · construção de canal</div>
+      <div class="hero-eyebrow">Setor · Agronegócio</div>
+      <h2 style="font-size:clamp(26px,4vw,36px)">Evolução da prospecção em <span style="color:var(--brand-light)">Agronegócio</span></h2>
+      <p>Esforço de cold call e reuniões geradas nesse segmento, mês a mês, ao longo de 15 meses de operação (mai/25 – jul/26).</p>
+    </div>
+
+    <p class="slbl slbl-first">Esforço total no setor</p>
+    <div class="grid-4">
+      <div class="mc mc-accent">
+        <div class="lbl">Esforço total</div>
+        <div class="val">8.458</div>
+        <div class="sub b">atividades · mai/25 – jul/26</div>
+      </div>
+      <div class="mc">
+        <div class="lbl">Conexões totais</div>
+        <div class="val">1.621</div>
+        <div class="sub">taxa de conexão 19,2%</div>
+      </div>
+      <div class="mc">
+        <div class="lbl">Conectado TD</div>
+        <div class="val">375</div>
+        <div class="sub">23,1% dos conectados</div>
+      </div>
+      <div class="mc">
+        <div class="lbl">Meses de operação</div>
+        <div class="val">15</div>
+        <div class="sub">dados consolidados no período</div>
+      </div>
+    </div>
+    <div class="grid-4" style="margin-top:12px">
+      <div class="mc">
+        <div class="lbl">Reuniões agendadas</div>
+        <div class="val">58</div>
+        <div class="sub">geradas pela prospecção ativa</div>
+      </div>
+      <div class="mc">
+        <div class="lbl">Reuniões realizadas</div>
+        <div class="val">46</div>
+        <div class="sub g">taxa de realização 79,3%</div>
+      </div>
+      <div class="mc">
+        <div class="lbl">Mês de maior esforço</div>
+        <div class="val" style="font-size:22px">mar/26</div>
+        <div class="sub">1.344 atividades</div>
+      </div>
+      <div class="mc">
+        <div class="lbl">Mês de mais reuniões</div>
+        <div class="val" style="font-size:22px">set/25</div>
+        <div class="sub g">6 realizadas</div>
+      </div>
+    </div>
+
+    <p class="slbl">Evolução mensal</p>
+    <div class="chart-controls" data-slug="agro">
+      <div class="seg-toggle">
+        <button class="seg-btn active" data-metric="combined">Esforço x Reuniões</button>
+        <button class="seg-btn" data-metric="esforco">Esforço</button>
+        <button class="seg-btn" data-metric="realizados">Reuniões realizadas</button>
+      </div>
+      <select class="period-select">
+            <option value="all">Todo o período</option>
+            <option value="6">Últimos 6 meses</option>
+            <option value="12">Últimos 12 meses</option>
+      </select>
+    </div>
+    <div class="leg" id="leg-agro">
+      <span><span class="ldot" style="background:#7F77DD"></span>Esforço (atividades)</span>
+    </div>
+    <div class="chart-box" style="height:260px">
+      <canvas id="c-agro" role="img" aria-label="Evolução mensal em Agronegócio">Volume mensal no setor Agronegócio.</canvas>
+    </div>
+
+    <hr>
+
+    <p class="slbl">Funil de conversão — Agronegócio</p>
+    <div style="margin-top:8px">
+      <div class="funnel-row">
+        <div class="fl">Esforço (atividades)</div>
+        <div class="fw"><div class="fb" style="width:100.00%;background:#185FA5">100.0% · 8.458</div></div>
+      </div>
+      <div class="funnel-row">
+        <div class="fl">Conexões totais</div>
+        <div class="fw"><div class="fb" style="width:19.17%;background:#1A538F">19.2% · 1.621</div></div>
+      </div>
+      <div class="funnel-row">
+        <div class="fl">Conectado TD</div>
+        <div class="fw"><div class="fb" style="width:4.43%;background:#1D6FA8">4.4% · 375</div></div>
+      </div>
+      <div class="funnel-row">
+        <div class="fl">Reuniões agendadas</div>
+        <div class="fw"><div class="fb" style="width:2.00%;background:#1D9E75">0.7% · 58</div></div>
+      </div>
+      <div class="funnel-row">
+        <div class="fl">Reuniões realizadas</div>
+        <div class="fw"><div class="fb" style="width:2.00%;background:#0F6E56">0.5% · 46</div></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div id="page-tur" class="page">
+  <div class="container">
+
+    <div class="hero" style="margin-bottom:40px">
+      <div class="hero-kicker">Operação outbound · construção de canal</div>
+      <div class="hero-eyebrow">Setor · Turismo Corporativo</div>
+      <h2 style="font-size:clamp(26px,4vw,36px)">Evolução da prospecção em <span style="color:var(--brand-light)">Turismo Corporativo</span></h2>
+      <p>Esforço de cold call e reuniões geradas nesse segmento, mês a mês, ao longo de 16 meses de operação (mai/23 – mai/26).</p>
+    </div>
+
+    <p class="slbl slbl-first">Esforço total no setor</p>
+    <div class="grid-4">
+      <div class="mc mc-accent">
+        <div class="lbl">Esforço total</div>
+        <div class="val">5.485</div>
+        <div class="sub b">atividades · mai/23 – mai/26</div>
+      </div>
+      <div class="mc">
+        <div class="lbl">Conexões totais</div>
+        <div class="val">2.566</div>
+        <div class="sub">taxa de conexão 46,8%</div>
+      </div>
+      <div class="mc">
+        <div class="lbl">Conectado TD</div>
+        <div class="val">557</div>
+        <div class="sub">21,7% dos conectados</div>
+      </div>
+      <div class="mc">
+        <div class="lbl">Meses de operação</div>
+        <div class="val">16</div>
+        <div class="sub">dados consolidados no período</div>
+      </div>
+    </div>
+    <div class="grid-4" style="margin-top:12px">
+      <div class="mc">
+        <div class="lbl">Reuniões agendadas</div>
+        <div class="val">88</div>
+        <div class="sub">geradas pela prospecção ativa</div>
+      </div>
+      <div class="mc">
+        <div class="lbl">Reuniões realizadas</div>
+        <div class="val">65</div>
+        <div class="sub g">taxa de realização 73,9%</div>
+      </div>
+      <div class="mc">
+        <div class="lbl">Mês de maior esforço</div>
+        <div class="val" style="font-size:22px">out/23</div>
+        <div class="sub">653 atividades</div>
+      </div>
+      <div class="mc">
+        <div class="lbl">Mês de mais reuniões</div>
+        <div class="val" style="font-size:22px">ago/23</div>
+        <div class="sub g">9 realizadas</div>
+      </div>
+    </div>
+
+    <p class="slbl">Evolução mensal</p>
+    <div class="chart-controls" data-slug="tur">
+      <div class="seg-toggle">
+        <button class="seg-btn active" data-metric="combined">Esforço x Reuniões</button>
+        <button class="seg-btn" data-metric="esforco">Esforço</button>
+        <button class="seg-btn" data-metric="realizados">Reuniões realizadas</button>
+      </div>
+      <select class="period-select">
+            <option value="all">Todo o período</option>
+            <option value="6">Últimos 6 meses</option>
+            <option value="12">Últimos 12 meses</option>
+      </select>
+    </div>
+    <div class="leg" id="leg-tur">
+      <span><span class="ldot" style="background:#D85A30"></span>Esforço (atividades)</span>
+    </div>
+    <div class="chart-box" style="height:260px">
+      <canvas id="c-tur" role="img" aria-label="Evolução mensal em Turismo Corporativo">Volume mensal no setor Turismo Corporativo.</canvas>
+    </div>
+
+    <hr>
+
+    <p class="slbl">Funil de conversão — Turismo Corporativo</p>
+    <div style="margin-top:8px">
+      <div class="funnel-row">
+        <div class="fl">Esforço (atividades)</div>
+        <div class="fw"><div class="fb" style="width:100.00%;background:#185FA5">100.0% · 5.485</div></div>
+      </div>
+      <div class="funnel-row">
+        <div class="fl">Conexões totais</div>
+        <div class="fw"><div class="fb" style="width:46.78%;background:#1A538F">46.8% · 2.566</div></div>
+      </div>
+      <div class="funnel-row">
+        <div class="fl">Conectado TD</div>
+        <div class="fw"><div class="fb" style="width:10.15%;background:#1D6FA8">10.2% · 557</div></div>
+      </div>
+      <div class="funnel-row">
+        <div class="fl">Reuniões agendadas</div>
+        <div class="fw"><div class="fb" style="width:2.00%;background:#1D9E75">1.6% · 88</div></div>
+      </div>
+      <div class="funnel-row">
+        <div class="fl">Reuniões realizadas</div>
+        <div class="fw"><div class="fb" style="width:2.00%;background:#0F6E56">1.2% · 65</div></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div id="page-hig" class="page">
+  <div class="container">
+
+    <div class="hero" style="margin-bottom:40px">
+      <div class="hero-kicker">Operação outbound · construção de canal</div>
+      <div class="hero-eyebrow">Setor · Higienização & Facilities</div>
+      <h2 style="font-size:clamp(26px,4vw,36px)">Evolução da prospecção em <span style="color:var(--brand-light)">Higienização & Facilities</span></h2>
+      <p>Esforço de cold call e reuniões geradas nesse segmento, mês a mês, ao longo de 16 meses de operação (mar/25 – jun/26).</p>
+    </div>
+
+    <p class="slbl slbl-first">Esforço total no setor</p>
+    <div class="grid-4">
+      <div class="mc mc-accent">
+        <div class="lbl">Esforço total</div>
+        <div class="val">5.188</div>
+        <div class="sub b">atividades · mar/25 – jun/26</div>
+      </div>
+      <div class="mc">
+        <div class="lbl">Conexões totais</div>
+        <div class="val">1.450</div>
+        <div class="sub">taxa de conexão 27,9%</div>
+      </div>
+      <div class="mc">
+        <div class="lbl">Conectado TD</div>
+        <div class="val">322</div>
+        <div class="sub">22,2% dos conectados</div>
+      </div>
+      <div class="mc">
+        <div class="lbl">Meses de operação</div>
+        <div class="val">16</div>
+        <div class="sub">dados consolidados no período</div>
+      </div>
+    </div>
+    <div class="grid-4" style="margin-top:12px">
+      <div class="mc">
+        <div class="lbl">Reuniões agendadas</div>
+        <div class="val">86</div>
+        <div class="sub">geradas pela prospecção ativa</div>
+      </div>
+      <div class="mc">
+        <div class="lbl">Reuniões realizadas</div>
+        <div class="val">76</div>
+        <div class="sub g">taxa de realização 88,4%</div>
+      </div>
+      <div class="mc">
+        <div class="lbl">Mês de maior esforço</div>
+        <div class="val" style="font-size:22px">ago/25</div>
+        <div class="sub">764 atividades</div>
+      </div>
+      <div class="mc">
+        <div class="lbl">Mês de mais reuniões</div>
+        <div class="val" style="font-size:22px">set/25</div>
+        <div class="sub g">8 realizadas</div>
+      </div>
+    </div>
+
+    <p class="slbl">Evolução mensal</p>
+    <div class="chart-controls" data-slug="hig">
+      <div class="seg-toggle">
+        <button class="seg-btn active" data-metric="combined">Esforço x Reuniões</button>
+        <button class="seg-btn" data-metric="esforco">Esforço</button>
+        <button class="seg-btn" data-metric="realizados">Reuniões realizadas</button>
+      </div>
+      <select class="period-select">
+            <option value="all">Todo o período</option>
+            <option value="6">Últimos 6 meses</option>
+            <option value="12">Últimos 12 meses</option>
+      </select>
+    </div>
+    <div class="leg" id="leg-hig">
+      <span><span class="ldot" style="background:#00B8AD"></span>Esforço (atividades)</span>
+    </div>
+    <div class="chart-box" style="height:260px">
+      <canvas id="c-hig" role="img" aria-label="Evolução mensal em Higienização & Facilities">Volume mensal no setor Higienização & Facilities.</canvas>
+    </div>
+
+    <hr>
+
+    <p class="slbl">Funil de conversão — Higienização & Facilities</p>
+    <div style="margin-top:8px">
+      <div class="funnel-row">
+        <div class="fl">Esforço (atividades)</div>
+        <div class="fw"><div class="fb" style="width:100.00%;background:#185FA5">100.0% · 5.188</div></div>
+      </div>
+      <div class="funnel-row">
+        <div class="fl">Conexões totais</div>
+        <div class="fw"><div class="fb" style="width:27.95%;background:#1A538F">27.9% · 1.450</div></div>
+      </div>
+      <div class="funnel-row">
+        <div class="fl">Conectado TD</div>
+        <div class="fw"><div class="fb" style="width:6.21%;background:#1D6FA8">6.2% · 322</div></div>
+      </div>
+      <div class="funnel-row">
+        <div class="fl">Reuniões agendadas</div>
+        <div class="fw"><div class="fb" style="width:2.00%;background:#1D9E75">1.7% · 86</div></div>
+      </div>
+      <div class="funnel-row">
+        <div class="fl">Reuniões realizadas</div>
+        <div class="fw"><div class="fb" style="width:2.00%;background:#0F6E56">1.5% · 76</div></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div id="page-cons" class="page">
+  <div class="container">
+
+    <div class="hero" style="margin-bottom:40px">
+      <div class="hero-kicker">Operação outbound · construção de canal</div>
+      <div class="hero-eyebrow">Setor · Consultoria Industrial</div>
+      <h2 style="font-size:clamp(26px,4vw,36px)">Evolução da prospecção em <span style="color:var(--brand-light)">Consultoria Industrial</span></h2>
+      <p>Esforço de cold call e reuniões geradas nesse segmento, mês a mês, ao longo de 12 meses de operação (abr/25 – mar/26).</p>
+    </div>
+
+    <p class="slbl slbl-first">Esforço total no setor</p>
+    <div class="grid-4">
+      <div class="mc mc-accent">
+        <div class="lbl">Esforço total</div>
+        <div class="val">4.598</div>
+        <div class="sub b">atividades · abr/25 – mar/26</div>
+      </div>
+      <div class="mc">
+        <div class="lbl">Conexões totais</div>
+        <div class="val">1.402</div>
+        <div class="sub">taxa de conexão 30,5%</div>
+      </div>
+      <div class="mc">
+        <div class="lbl">Conectado TD</div>
+        <div class="val">213</div>
+        <div class="sub">15,2% dos conectados</div>
+      </div>
+      <div class="mc">
+        <div class="lbl">Meses de operação</div>
+        <div class="val">12</div>
+        <div class="sub">dados consolidados no período</div>
+      </div>
+    </div>
+    <div class="grid-4" style="margin-top:12px">
+      <div class="mc">
+        <div class="lbl">Reuniões agendadas</div>
+        <div class="val">43</div>
+        <div class="sub">geradas pela prospecção ativa</div>
+      </div>
+      <div class="mc">
+        <div class="lbl">Reuniões realizadas</div>
+        <div class="val">31</div>
+        <div class="sub g">taxa de realização 72,1%</div>
+      </div>
+      <div class="mc">
+        <div class="lbl">Mês de maior esforço</div>
+        <div class="val" style="font-size:22px">out/25</div>
+        <div class="sub">792 atividades</div>
+      </div>
+      <div class="mc">
+        <div class="lbl">Mês de mais reuniões</div>
+        <div class="val" style="font-size:22px">jun/25</div>
+        <div class="sub g">5 realizadas</div>
+      </div>
+    </div>
+
+    <p class="slbl">Evolução mensal</p>
+    <div class="chart-controls" data-slug="cons">
+      <div class="seg-toggle">
+        <button class="seg-btn active" data-metric="combined">Esforço x Reuniões</button>
+        <button class="seg-btn" data-metric="esforco">Esforço</button>
+        <button class="seg-btn" data-metric="realizados">Reuniões realizadas</button>
+      </div>
+      <select class="period-select">
+            <option value="all">Todo o período</option>
+            <option value="6">Últimos 6 meses</option>
+      </select>
+    </div>
+    <div class="leg" id="leg-cons">
+      <span><span class="ldot" style="background:#378ADD"></span>Esforço (atividades)</span>
+    </div>
+    <div class="chart-box" style="height:260px">
+      <canvas id="c-cons" role="img" aria-label="Evolução mensal em Consultoria Industrial">Volume mensal no setor Consultoria Industrial.</canvas>
+    </div>
+
+    <hr>
+
+    <p class="slbl">Funil de conversão — Consultoria Industrial</p>
+    <div style="margin-top:8px">
+      <div class="funnel-row">
+        <div class="fl">Esforço (atividades)</div>
+        <div class="fw"><div class="fb" style="width:100.00%;background:#185FA5">100.0% · 4.598</div></div>
+      </div>
+      <div class="funnel-row">
+        <div class="fl">Conexões totais</div>
+        <div class="fw"><div class="fb" style="width:30.49%;background:#1A538F">30.5% · 1.402</div></div>
+      </div>
+      <div class="funnel-row">
+        <div class="fl">Conectado TD</div>
+        <div class="fw"><div class="fb" style="width:4.63%;background:#1D6FA8">4.6% · 213</div></div>
+      </div>
+      <div class="funnel-row">
+        <div class="fl">Reuniões agendadas</div>
+        <div class="fw"><div class="fb" style="width:2.00%;background:#1D9E75">0.9% · 43</div></div>
+      </div>
+      <div class="funnel-row">
+        <div class="fl">Reuniões realizadas</div>
+        <div class="fw"><div class="fb" style="width:2.00%;background:#0F6E56">0.7% · 31</div></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div id="page-ene" class="page">
+  <div class="container">
+
+    <div class="hero" style="margin-bottom:40px">
+      <div class="hero-kicker">Operação outbound · construção de canal</div>
+      <div class="hero-eyebrow">Setor · Energia</div>
+      <h2 style="font-size:clamp(26px,4vw,36px)">Evolução da prospecção em <span style="color:var(--brand-light)">Energia</span></h2>
+      <p>Esforço de cold call e reuniões geradas nesse segmento, mês a mês, ao longo de 10 meses de operação (set/24 – mai/26).</p>
+    </div>
+
+    <p class="slbl slbl-first">Esforço total no setor</p>
+    <div class="grid-4">
+      <div class="mc mc-accent">
+        <div class="lbl">Esforço total</div>
+        <div class="val">4.074</div>
+        <div class="sub b">atividades · set/24 – mai/26</div>
+      </div>
+      <div class="mc">
+        <div class="lbl">Conexões totais</div>
+        <div class="val">1.154</div>
+        <div class="sub">taxa de conexão 28,3%</div>
+      </div>
+      <div class="mc">
+        <div class="lbl">Conectado TD</div>
+        <div class="val">210</div>
+        <div class="sub">18,2% dos conectados</div>
+      </div>
+      <div class="mc">
+        <div class="lbl">Meses de operação</div>
+        <div class="val">10</div>
+        <div class="sub">dados consolidados no período</div>
+      </div>
+    </div>
+    <div class="grid-4" style="margin-top:12px">
+      <div class="mc">
+        <div class="lbl">Reuniões agendadas</div>
+        <div class="val">19</div>
+        <div class="sub">geradas pela prospecção ativa</div>
+      </div>
+      <div class="mc">
+        <div class="lbl">Reuniões realizadas</div>
+        <div class="val">17</div>
+        <div class="sub g">taxa de realização 89,5%</div>
+      </div>
+      <div class="mc">
+        <div class="lbl">Mês de maior esforço</div>
+        <div class="val" style="font-size:22px">nov/25</div>
+        <div class="sub">649 atividades</div>
+      </div>
+      <div class="mc">
+        <div class="lbl">Mês de mais reuniões</div>
+        <div class="val" style="font-size:22px">jan/26</div>
+        <div class="sub g">3 realizadas</div>
+      </div>
+    </div>
+
+    <p class="slbl">Evolução mensal</p>
+    <div class="chart-controls" data-slug="ene">
+      <div class="seg-toggle">
+        <button class="seg-btn active" data-metric="combined">Esforço x Reuniões</button>
+        <button class="seg-btn" data-metric="esforco">Esforço</button>
+        <button class="seg-btn" data-metric="realizados">Reuniões realizadas</button>
+      </div>
+      <select class="period-select">
+            <option value="all">Todo o período</option>
+            <option value="6">Últimos 6 meses</option>
+      </select>
+    </div>
+    <div class="leg" id="leg-ene">
+      <span><span class="ldot" style="background:#EF9F27"></span>Esforço (atividades)</span>
+    </div>
+    <div class="chart-box" style="height:260px">
+      <canvas id="c-ene" role="img" aria-label="Evolução mensal em Energia">Volume mensal no setor Energia.</canvas>
+    </div>
+
+    <hr>
+
+    <p class="slbl">Funil de conversão — Energia</p>
+    <div style="margin-top:8px">
+      <div class="funnel-row">
+        <div class="fl">Esforço (atividades)</div>
+        <div class="fw"><div class="fb" style="width:100.00%;background:#185FA5">100.0% · 4.074</div></div>
+      </div>
+      <div class="funnel-row">
+        <div class="fl">Conexões totais</div>
+        <div class="fw"><div class="fb" style="width:28.33%;background:#1A538F">28.3% · 1.154</div></div>
+      </div>
+      <div class="funnel-row">
+        <div class="fl">Conectado TD</div>
+        <div class="fw"><div class="fb" style="width:5.15%;background:#1D6FA8">5.2% · 210</div></div>
+      </div>
+      <div class="funnel-row">
+        <div class="fl">Reuniões agendadas</div>
+        <div class="fw"><div class="fb" style="width:2.00%;background:#1D9E75">0.5% · 19</div></div>
+      </div>
+      <div class="funnel-row">
+        <div class="fl">Reuniões realizadas</div>
+        <div class="fw"><div class="fb" style="width:2.00%;background:#0F6E56">0.4% · 17</div></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+const SECTOR_DATA = {"tec": {"months": ["jan/23", "fev/23", "mar/23", "abr/23", "mai/23", "jun/23", "jul/23", "ago/23", "set/23", "out/23", "nov/23", "dez/23", "jan/24", "fev/24", "mar/24", "abr/24", "mai/24", "jun/24", "jul/24", "ago/24", "set/24", "out/24", "nov/24", "dez/24", "jan/25", "fev/25", "mar/25", "abr/25", "mai/25", "jun/25", "jul/25", "ago/25", "set/25", "out/25", "nov/25", "dez/25", "jan/26", "fev/26", "mar/26", "abr/26", "mai/26", "jun/26", "jul/26"], "esforco": [201, 480, 1167, 741, 654, 403, 523, 458, 447, 219, 338, 677, 1639, 1654, 1070, 1190, 1090, 1569, 1489, 1643, 1945, 2008, 1399, 1476, 1374, 1632, 1822, 1827, 1236, 1800, 3006, 2954, 2196, 3036, 2030, 1947, 2515, 2240, 3051, 2615, 2334, 2775, 2185], "realizados": [2, 0, 8, 11, 8, 5, 3, 5, 4, 7, 5, 3, 7, 10, 10, 12, 3, 14, 10, 13, 17, 7, 4, 6, 11, 7, 11, 13, 17, 18, 31, 20, 22, 32, 25, 17, 31, 28, 17, 20, 21, 18, 31], "accent": "#00B8AD"}, "log": {"months": ["ago/25", "set/25", "out/25", "nov/25", "dez/25", "jan/26", "fev/26", "mar/26", "abr/26", "mai/26", "jun/26", "jul/26"], "esforco": [7, 600, 449, 310, 278, 1217, 1080, 1028, 1056, 1000, 1308, 608], "realizados": [0, 2, 7, 7, 3, 12, 20, 19, 24, 23, 21, 7], "accent": "#378ADD"}, "edu": {"months": ["out/24", "nov/24", "dez/24", "jan/25", "fev/25", "mar/25", "abr/25", "mai/25", "jun/25", "jul/25", "ago/25", "set/25", "out/25", "nov/25", "dez/25", "jan/26", "fev/26", "mar/26", "abr/26", "mai/26", "jun/26", "jul/26"], "esforco": [793, 550, 321, 514, 489, 433, 368, 463, 696, 607, 404, 402, 400, 316, 162, 400, 363, 205, 230, 380, 200, 204], "realizados": [0, 3, 2, 3, 4, 1, 2, 5, 2, 4, 2, 4, 3, 3, 3, 4, 5, 3, 2, 3, 2, 5], "accent": "#EF9F27"}, "agro": {"months": ["mai/25", "jun/25", "jul/25", "ago/25", "set/25", "out/25", "nov/25", "dez/25", "jan/26", "fev/26", "mar/26", "abr/26", "mai/26", "jun/26", "jul/26"], "esforco": [385, 334, 314, 1181, 349, 726, 523, 405, 351, 540, 1344, 613, 393, 455, 545], "realizados": [4, 4, 2, 3, 6, 4, 6, 3, 5, 3, 0, 1, 4, 0, 1], "accent": "#7F77DD"}, "tur": {"months": ["mai/23", "jun/23", "jul/23", "ago/23", "set/23", "out/23", "nov/23", "dez/23", "jan/24", "fev/24", "mar/24", "abr/24", "mai/24", "jun/24", "jul/24", "mai/26"], "esforco": [263, 483, 468, 522, 462, 653, 261, 267, 445, 294, 512, 396, 449, 5, 4, 1], "realizados": [0, 6, 7, 9, 3, 2, 8, 4, 2, 8, 3, 8, 4, 1, 0, 0], "accent": "#D85A30"}, "hig": {"months": ["mar/25", "abr/25", "mai/25", "jun/25", "jul/25", "ago/25", "set/25", "out/25", "nov/25", "dez/25", "jan/26", "fev/26", "mar/26", "abr/26", "mai/26", "jun/26"], "esforco": [152, 405, 389, 334, 343, 764, 424, 460, 349, 172, 398, 307, 293, 229, 167, 2], "realizados": [0, 1, 6, 6, 0, 6, 8, 8, 8, 5, 5, 7, 8, 5, 3, 0], "accent": "#00B8AD"}, "cons": {"months": ["abr/25", "mai/25", "jun/25", "jul/25", "ago/25", "set/25", "out/25", "nov/25", "dez/25", "jan/26", "fev/26", "mar/26"], "esforco": [484, 304, 439, 324, 456, 442, 792, 270, 177, 548, 350, 12], "realizados": [1, 3, 5, 0, 3, 1, 5, 3, 2, 4, 4, 0], "accent": "#378ADD"}, "ene": {"months": ["set/24", "set/25", "out/25", "nov/25", "dez/25", "jan/26", "fev/26", "mar/26", "abr/26", "mai/26"], "esforco": [9, 441, 601, 649, 338, 541, 433, 408, 519, 135], "realizados": [2, 0, 0, 2, 1, 3, 2, 3, 1, 3], "accent": "#EF9F27"}};
+
+function sw(id, btn) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
+  document.getElementById('page-' + id).classList.add('active');
+  btn.classList.add('active');
+  setTimeout(() => ensureChart(id), 50);
+}
+
+const gc = 'rgba(255,255,255,0.06)';
+const lc = '#6B7877';
+const chartInstances = {};
+const chartState = {};
+
+function filterByPeriod(arr, months, periodVal) {
+  if (periodVal === 'all') return arr;
+  const n = parseInt(periodVal, 10);
+  return arr.slice(-n);
+}
+
+function buildChart(slug) {
+  const d = SECTOR_DATA[slug];
+  const state = chartState[slug] || { metric: 'combined', period: 'all' };
+  chartState[slug] = state;
+
+  const months = filterByPeriod(d.months, d.months, state.period);
+  const legEl = document.getElementById('leg-' + slug);
+
+  if (chartInstances[slug]) {
+    chartInstances[slug].destroy();
+  }
+
+  const nMonths = months.length;
+
+  if (state.metric === 'combined') {
+    const esforco = filterByPeriod(d.esforco, d.months, state.period);
+    const realizados = filterByPeriod(d.realizados, d.months, state.period);
+    if (legEl) {
+      legEl.innerHTML = '<span><span class="ldot" style="background:' + d.accent + '"></span>Esforço (atividades)</span>' +
+        '<span><span class="ldot" style="background:#1D9E75"></span>Reuniões realizadas (eixo direito)</span>';
+    }
+    chartInstances[slug] = new Chart(document.getElementById('c-' + slug), {
+      type: 'bar',
+      data: {
+        labels: months,
+        datasets: [
+          { label: 'Esforço', data: esforco, backgroundColor: d.accent + 'CC', borderRadius: 3, order: 2 },
+          { label: 'Reuniões realizadas', data: realizados, type: 'line', borderColor: '#1D9E75', backgroundColor: 'rgba(29,158,117,0.08)', pointBackgroundColor: '#1D9E75', pointRadius: 3, fill: true, tension: 0.3, yAxisID: 'y2', order: 1 }
+        ]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+          x: { ticks: { color: lc, font: { size: 9, family: "'DM Mono'" }, maxRotation: 45, autoSkip: nMonths > 18 }, grid: { display: false } },
+          y: { ticks: { color: lc, font: { size: 10 } }, grid: { color: gc } },
+          y2: { position: 'right', ticks: { color: '#1D9E75', font: { size: 10 } }, grid: { display: false } }
+        }
+      }
+    });
+    return;
+  }
+
+  const isEsforco = state.metric === 'esforco';
+  const values = isEsforco ? filterByPeriod(d.esforco, d.months, state.period) : filterByPeriod(d.realizados, d.months, state.period);
+  const color = isEsforco ? d.accent : '#1D9E75';
+  const label = isEsforco ? 'Esforço (atividades)' : 'Reuniões realizadas';
+
+  if (legEl) {
+    legEl.innerHTML = '<span><span class="ldot" style="background:' + color + '"></span>' + label + '</span>';
+  }
+
+  const dataset = isEsforco
+    ? { label: label, data: values, backgroundColor: color + 'CC', borderRadius: 3, type: 'bar' }
+    : { label: label, data: values, type: 'line', borderColor: '#1D9E75', backgroundColor: 'rgba(29,158,117,0.08)', pointBackgroundColor: '#1D9E75', pointRadius: 3, fill: true, tension: 0.3 };
+
+  chartInstances[slug] = new Chart(document.getElementById('c-' + slug), {
+    type: isEsforco ? 'bar' : 'line',
+    data: {
+      labels: months,
+      datasets: [dataset]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { ticks: { color: lc, font: { size: 9, family: "'DM Mono'" }, maxRotation: 45, autoSkip: nMonths > 18 }, grid: { display: false } },
+        y: { ticks: { color: lc, font: { size: 10 } }, grid: { color: gc } }
+      }
+    }
+  });
+}
+
+function ensureChart(slug) {
+  if (chartInstances[slug]) return;
+  buildChart(slug);
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('.chart-controls').forEach(ctrl => {
+    const slug = ctrl.getAttribute('data-slug');
+    chartState[slug] = { metric: 'combined', period: 'all' };
+
+    ctrl.querySelectorAll('.seg-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        ctrl.querySelectorAll('.seg-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        chartState[slug].metric = btn.getAttribute('data-metric');
+        buildChart(slug);
+      });
+    });
+
+    const sel = ctrl.querySelector('.period-select');
+    sel.addEventListener('change', () => {
+      chartState[slug].period = sel.value;
+      buildChart(slug);
+    });
+  });
+
+  ensureChart('tec');
+});
+</script>
+</body>
+</html>
